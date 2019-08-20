@@ -1,8 +1,8 @@
-import { createHash, Hash } from 'crypto';
+import { createHash, Hash } from "crypto";
 
-import { Builder } from './builder';
-import { EImportKind, Import } from './import';
-import { NamedRenderer, TRenderer } from './renderer';
+import { Builder } from "./builder";
+import { EImportKind, Import } from "./import";
+import { NamedRenderer, TRenderer } from "./renderer";
 
 const headerTemplateWithoutBespoke: string = `/**
  * This file is fully generated; do not manually edit.
@@ -26,32 +26,44 @@ export interface IModule {
 }
 
 export class Module extends NamedRenderer {
+
   public static new(props: IModule): Module {
     return new Module(props);
   }
 
-  private static async getHash(builder: Builder): Promise<string> {
-    const hash: Hash = createHash('SHA512');
-    const builderContent = await builder.print();
-    hash.update(builderContent);
+  private static getHash(builder: Builder): string {
+    const hash: Hash = createHash("SHA512");
+    hash.update(builder.print());
 
-    return hash.digest('base64');
+    return hash.digest("base64");
   }
 
-  private static renderImports(builder: Builder, imports: Import[]): void {
+  private static renderImports(
+    builder: Builder,
+    imports: Import[],
+  ): void {
     Module.renderImportSection(
       builder,
-      imports.filter((i: Import): boolean => i.kind() === EImportKind.RAW),
+      imports
+        .filter(
+          (i: Import): boolean => i.kind() === EImportKind.RAW,
+        ),
     );
     builder.ensureOnNewlineAfterEmptyline();
     Module.renderImportSection(
       builder,
-      imports.filter((i: Import): boolean => i.kind() === EImportKind.GLOBAL),
+      imports
+        .filter(
+          (i: Import): boolean => i.kind() === EImportKind.GLOBAL,
+        ),
     );
     builder.ensureOnNewlineAfterEmptyline();
     Module.renderImportSection(
       builder,
-      imports.filter((i: Import): boolean => i.kind() === EImportKind.LOCAL),
+      imports
+        .filter(
+          (i: Import): boolean => i.kind() === EImportKind.LOCAL,
+        ),
     );
     builder.ensureOnNewlineAfterEmptyline();
   }
@@ -60,22 +72,29 @@ export class Module extends NamedRenderer {
     builder: Builder,
     imports: Import[],
   ): void {
-    imports.forEach((i: Import) => {
-      i.run(builder);
-    });
+    imports.forEach(
+      (i: Import) => {
+        i.run(builder);
+      },
+    );
   }
 
   private static renderNonImports(
     builder: Builder,
     nonImports: TRenderer[],
   ): void {
-    nonImports.forEach((r: TRenderer): void => {
-      builder.ensureOnNewlineAfterEmptyline();
-      Module.genericRenderer(r)(builder);
-    });
+    nonImports
+      .forEach(
+        (r: TRenderer): void => {
+          builder.ensureOnNewlineAfterEmptyline();
+          Module.genericRenderer(r)(builder);
+        },
+      );
   }
 
-  private constructor(private readonly props: IModule) {
+  private constructor(
+    private readonly props: IModule,
+  ) {
     super();
   }
 
@@ -83,29 +102,33 @@ export class Module extends NamedRenderer {
     return this.props.destination;
   }
 
-  protected async render(builder: Builder): Promise<void> {
+  protected render(builder: Builder): void {
     const imports: Import[] = this.props.content
-      .filter((i: TRenderer): i is Import => i instanceof Import)
-      .sort((a: Import, b: Import) => a.compare(b));
+      .filter(
+        (i: TRenderer): i is Import => i instanceof Import,
+      )
+      .sort(
+        (a: Import, b: Import) => a.compare(b),
+      );
     Module.renderImports(builder, imports);
 
-    const nonImports: TRenderer[] = this.props.content.filter(
-      (i: TRenderer): boolean => !(i instanceof Import),
-    );
+    const nonImports: TRenderer[] = this.props.content
+      .filter(
+        (i: TRenderer): boolean => !(i instanceof Import),
+      );
     Module.renderNonImports(builder, nonImports);
 
     const bespokes: string[] = builder.getBespokes();
-    let header: string = '';
-    const hash = await Module.getHash(builder);
+    let header: string = "";
     if (bespokes.length > 0) {
       header = headerTemplateWithBespoke
-        .replace('@0', `${builder.getPath()}::${builder.getName()}`)
-        .replace('@1', bespokes.join(', '))
-        .replace('@2', hash);
+        .replace("@0", `${builder.getPath()}::${builder.getName()}`)
+        .replace("@1", bespokes.join(", "))
+        .replace("@2", Module.getHash(builder));
     } else {
       header = headerTemplateWithoutBespoke
-        .replace('@0', `${builder.getPath()}::${builder.getName()}`)
-        .replace('@1', hash);
+        .replace("@0", `${builder.getPath()}::${builder.getName()}`)
+        .replace("@1", Module.getHash(builder));
     }
     builder.setHeader(header);
   }
@@ -119,7 +142,7 @@ export class Module extends NamedRenderer {
     const bespokeArray: string[] = builder.getBespokes();
     const bespokeSet: Set<string> = new Set(bespokeArray);
     if (bespokeSet.size < bespokeArray.length) {
-      throw new Error('Duplicated Bespoke Sections');
+      throw new Error("Duplicated Bespoke Sections");
     }
   }
 
@@ -127,7 +150,7 @@ export class Module extends NamedRenderer {
     const identifierArray: string[] = builder.getIdentifiers();
     const identifierSet: Set<string> = new Set(identifierArray);
     if (identifierSet.size < identifierArray.length) {
-      throw new Error('Duplicated Identifier Names');
+      throw new Error("Duplicated Identifier Names");
     }
   }
 }
