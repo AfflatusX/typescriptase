@@ -8,6 +8,7 @@ enum EBuilderVerifyMode {
   PRINT,
   SWITCH,
   TRY,
+  BLOB,
 }
 
 export interface IBuilder {
@@ -31,6 +32,10 @@ export class Builder {
   protected tryLevel: number = 0;
 
   public constructor(protected readonly props: IBuilder) {}
+
+  public addBlob(blob: string): Builder {
+    return this._add(blob, false, false, false, true);
+  }
 
   public add(content: string): Builder {
     return this._add(content, false, false, false);
@@ -234,8 +239,12 @@ export class Builder {
     isAsync: boolean,
     newlineAfter: boolean,
     isReturn: boolean,
+    isBlob: boolean = false,
   ): Builder {
-    this.verify(EBuilderVerifyMode.CONTENT, content);
+    this.verify(
+      isBlob ? EBuilderVerifyMode.BLOB : EBuilderVerifyMode.CONTENT,
+      content,
+    );
     if (this.built.length > 0 && this.built.endsWith('\n')) {
       this.built += '  '.repeat(this.indentation);
     }
