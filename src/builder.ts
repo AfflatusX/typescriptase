@@ -16,13 +16,12 @@ export interface IBuilder {
 }
 
 export class Builder {
-
   public static new(props: IBuilder): Builder {
     return new Builder(props);
   }
 
   private bespokes: string[] = [];
-  private built: string = "";
+  private built: string = '';
   private forLevel: number = 0;
   private header: string | undefined;
   private identifiers: string[] = [];
@@ -31,9 +30,7 @@ export class Builder {
   private switchCaseLevel: number = 0;
   private tryLevel: number = 0;
 
-  private constructor(
-    private readonly props: IBuilder,
-  ) {}
+  public constructor(private readonly props: IBuilder) {}
 
   public add(content: string): Builder {
     return this._add(content, false, false, false);
@@ -55,16 +52,14 @@ export class Builder {
     this.switchCaseLevel++;
     this.verify(EBuilderVerifyMode.CASE);
 
-    return this
-      .addThenNewline(`case ${check}: {`)
-      .indent();
+    return this.addThenNewline(`case ${check}: {`).indent();
   }
 
   public catch(name?: string): Builder {
     this.verify(EBuilderVerifyMode.TRY);
     this.unindent();
     if (name === undefined) {
-      this.addThenNewline("} catch {");
+      this.addThenNewline('} catch {');
     } else {
       this.addThenNewline(`} catch(${name}) {`);
     }
@@ -76,73 +71,54 @@ export class Builder {
     this.switchCaseLevel++;
     this.verify(EBuilderVerifyMode.CASE);
 
-    return this
-      .addThenNewline("default: {")
-      .indent();
+    return this.addThenNewline('default: {').indent();
   }
 
   public else(): Builder {
     this.verify(EBuilderVerifyMode.IF);
 
-    return this
-      .unindent()
-      .addThenNewline("} else {")
-      .indent();
+    return this.unindent().addThenNewline('} else {').indent();
   }
 
   public elseIf(check: string): Builder {
     this.verify(EBuilderVerifyMode.IF);
 
-    return this
-      .unindent()
-      .addThenNewline(`} else if (${check}) {`)
-      .indent();
+    return this.unindent().addThenNewline(`} else if (${check}) {`).indent();
   }
 
   public endCase(): Builder {
     this.verify(EBuilderVerifyMode.CASE);
     this.switchCaseLevel--;
 
-    return this
-      .addThenNewline("break;")
-      .unindent()
-      .addThenNewline("}");
+    return this.addThenNewline('break;').unindent().addThenNewline('}');
   }
 
   public endFor(): Builder {
     this.verify(EBuilderVerifyMode.FOR);
     this.forLevel--;
 
-    return this
-      .unindent()
-      .addThenNewline("}");
+    return this.unindent().addThenNewline('}');
   }
 
   public endIf(): Builder {
     this.verify(EBuilderVerifyMode.IF);
     this.ifLevel--;
 
-    return this
-      .unindent()
-      .addThenNewline("}");
+    return this.unindent().addThenNewline('}');
   }
 
   public endSwitch(): Builder {
     this.verify(EBuilderVerifyMode.SWITCH);
     this.switchCaseLevel--;
 
-    return this
-      .unindent()
-      .addThenNewline("}");
+    return this.unindent().addThenNewline('}');
   }
 
   public endTry(): Builder {
     this.verify(EBuilderVerifyMode.TRY);
     this.tryLevel--;
 
-    return this
-      .unindent()
-      .addThenNewline("}");
+    return this.unindent().addThenNewline('}');
   }
 
   public ensureOnNewline(): Builder {
@@ -156,19 +132,14 @@ export class Builder {
   public finally(): Builder {
     this.verify(EBuilderVerifyMode.TRY);
 
-    return this
-      .unindent()
-      .addThenNewline("} finally {")
-      .indent();
+    return this.unindent().addThenNewline('} finally {').indent();
   }
 
   public for(check: string): Builder {
     this.forLevel++;
     this.verify(EBuilderVerifyMode.FOR);
 
-    return this
-      .addThenNewline(`for (${check}) {`)
-      .indent();
+    return this.addThenNewline(`for (${check}) {`).indent();
   }
 
   public getBespokes(): string[] {
@@ -191,9 +162,7 @@ export class Builder {
     this.ifLevel++;
     this.verify(EBuilderVerifyMode.IF);
 
-    return this
-      .addThenNewline(`if (${check}) {`)
-      .indent();
+    return this.addThenNewline(`if (${check}) {`).indent();
   }
 
   public indent(): Builder {
@@ -208,7 +177,7 @@ export class Builder {
     }
     b.ensureOnNewlineAfterEmptyline();
     b.built += this.built;
-    while (b.built.endsWith("\n\n")) {
+    while (b.built.endsWith('\n\n')) {
       b.built = b.built.slice(0, b.built.length - 1);
     }
 
@@ -234,18 +203,14 @@ export class Builder {
     this.switchCaseLevel++;
     this.verify(EBuilderVerifyMode.SWITCH);
 
-    return this
-      .addThenNewline(`switch (${check}) {`)
-      .indent();
+    return this.addThenNewline(`switch (${check}) {`).indent();
   }
 
   public try(): Builder {
     this.tryLevel++;
     this.verify(EBuilderVerifyMode.TRY);
 
-    return this
-      .addThenNewline("try {")
-      .indent();
+    return this.addThenNewline('try {').indent();
   }
 
   public unindent(): Builder {
@@ -271,18 +236,18 @@ export class Builder {
     isReturn: boolean,
   ): Builder {
     this.verify(EBuilderVerifyMode.CONTENT, content);
-    if (this.built.length > 0 && this.built.endsWith("\n")) {
-      this.built += "  ".repeat(this.indentation);
+    if (this.built.length > 0 && this.built.endsWith('\n')) {
+      this.built += '  '.repeat(this.indentation);
     }
     if (isReturn) {
-      this.built += "return ";
+      this.built += 'return ';
     }
     if (isAsync) {
-      this.built += "await ";
+      this.built += 'await ';
     }
     this.built += content;
     if (newlineAfter) {
-      this.built += "\n";
+      this.built += '\n';
     }
 
     return this;
@@ -294,13 +259,13 @@ export class Builder {
     }
     let newLinesFound: number = 0;
     for (let idx: number = 0; idx < newLinesWanted; idx++) {
-      if (this.built.charAt(this.built.length - idx - 1) === "\n") {
+      if (this.built.charAt(this.built.length - idx - 1) === '\n') {
         newLinesFound++;
       } else {
         break;
       }
     }
-    this.built += "\n".repeat(newLinesWanted - newLinesFound);
+    this.built += '\n'.repeat(newLinesWanted - newLinesFound);
 
     return this;
   }
@@ -312,83 +277,80 @@ export class Builder {
     return this;
   }
 
-  private verify(
-    mode: EBuilderVerifyMode,
-    content?: string,
-  ): void {
+  private verify(mode: EBuilderVerifyMode, content?: string): void {
     if (mode === EBuilderVerifyMode.CASE) {
       if (this.switchCaseLevel < 1 || this.switchCaseLevel % 2 !== 0) {
-        throw new Error("Not inside case statement");
+        throw new Error('Not inside case statement');
       }
     }
     if (mode === EBuilderVerifyMode.CONTENT) {
       if (content === undefined) {
-        throw new Error("Unreachable");
+        throw new Error('Unreachable');
       }
-      if (content === "") {
-        throw new Error("Unexpected empty string");
+      if (content === '') {
+        throw new Error('Unexpected empty string');
       }
-      if (content.includes("\n")) {
-        throw new Error("Unexpected newline");
+      if (content.includes('\n')) {
+        throw new Error('Unexpected newline');
       }
-      if (content.includes("\t")) {
-        throw new Error("Unexpected tab");
+      if (content.includes('\t')) {
+        throw new Error('Unexpected tab');
       }
-      if (content.includes("await")) {
-        throw new Error("Unexpected await");
+      if (content.includes('await')) {
+        throw new Error('Unexpected await');
       }
-      if (content.includes("return")) {
-        throw new Error("Unexpected return");
+      if (content.includes('return')) {
+        throw new Error('Unexpected return');
       }
     }
     if (mode === EBuilderVerifyMode.HEADER) {
       if (this.header !== undefined) {
-        throw new Error("Cannot set header twice");
+        throw new Error('Cannot set header twice');
       }
     }
     if (mode === EBuilderVerifyMode.INDENT) {
-      if (!this.built.endsWith("\n")) {
-        throw new Error("Cannot change indentation without being on newline");
+      if (!this.built.endsWith('\n')) {
+        throw new Error('Cannot change indentation without being on newline');
       }
       if (this.indentation < 0) {
-        throw new Error("Cannot unindent past 0");
+        throw new Error('Cannot unindent past 0');
       }
     }
     if (mode === EBuilderVerifyMode.PRINT) {
       if (this.indentation !== 0) {
-        throw new Error("Cannot print without zeroed indentation");
+        throw new Error('Cannot print without zeroed indentation');
       }
       if (this.forLevel !== 0) {
-        throw new Error("Cannot print without completing for statements");
+        throw new Error('Cannot print without completing for statements');
       }
       if (this.ifLevel !== 0) {
-        throw new Error("Cannot print without completing if statements");
+        throw new Error('Cannot print without completing if statements');
       }
       if (this.switchCaseLevel !== 0) {
-        throw new Error("Cannot print without completing switch statements");
+        throw new Error('Cannot print without completing switch statements');
       }
       if (this.tryLevel !== 0) {
-        throw new Error("Cannot print without completing try statements");
+        throw new Error('Cannot print without completing try statements');
       }
     }
     if (mode === EBuilderVerifyMode.FOR) {
       if (this.forLevel < 1) {
-        throw new Error("Not inside for statement");
+        throw new Error('Not inside for statement');
       }
     }
     if (mode === EBuilderVerifyMode.IF) {
       if (this.ifLevel < 1) {
-        throw new Error("Not inside if statement");
+        throw new Error('Not inside if statement');
       }
     }
     if (mode === EBuilderVerifyMode.SWITCH) {
       if (this.switchCaseLevel < 1 || this.switchCaseLevel % 2 !== 1) {
-        throw new Error("Not inside switch statement");
+        throw new Error('Not inside switch statement');
       }
     }
     if (mode === EBuilderVerifyMode.TRY) {
       if (this.tryLevel < 1) {
-        throw new Error("Not inside try statement");
+        throw new Error('Not inside try statement');
       }
     }
   }
