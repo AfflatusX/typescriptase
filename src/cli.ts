@@ -1,49 +1,38 @@
 #!/usr/bin/env node
 
-import { createHash, Hash } from "crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
-import { dirname, sep } from "path";
-import * as yargs from "yargs";
+import { createHash, Hash } from 'crypto';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { dirname, sep } from 'path';
+import * as yargs from 'yargs';
 
-import { Builder, endTemplate, Module, startTemplate } from "./index";
+import { Builder, endTemplate, Module, startTemplate } from './index';
 
 if (require.main === module) {
   yargs
     .usage(
-      "$0",
+      '$0',
       true,
-      (y: yargs.Argv<any>): yargs.Argv<any> => y
-        .option(
-          "expectNoChanges",
-          {
+      (y: yargs.Argv<any>): yargs.Argv<any> =>
+        y
+          .option('expectNoChanges', {
             boolean: true,
-            describe: "Expect No Changes",
-          },
-        )
-        .option(
-          "files",
-          {
+            describe: 'Expect No Changes',
+          })
+          .option('files', {
             array: true,
             demandOption: true,
-            describe: "Files",
-          },
-        ),
+            describe: 'Files',
+          }),
       (argv: yargs.Arguments<any>): void => {
-        argv.files.forEach(
-          (path: string): void => {
-            codegenFile(path, argv.expectNoChanges);
-          },
-        );
+        argv.files.forEach((path: string): void => {
+          codegenFile(path, argv.expectNoChanges);
+        });
       },
     )
-    .help()
-    .argv;
+    .help().argv;
 }
 
-export function codegenFile(
-  path: string,
-  expectNoChanges: boolean,
-): void {
+export function codegenFile(path: string, expectNoChanges: boolean): void {
   let file: { [index: string]: any };
   file = require(`${process.cwd()}/${path}`);
   for (const name in file) {
@@ -53,13 +42,13 @@ export function codegenFile(
   }
 }
 
-export function codegenModule(
+export async function codegenModule(
   module: Module,
   path: string,
   name: string,
   expectNoChanges: boolean,
-): void {
-  let dirBuilder: string = "";
+): Promise<void> {
+  let dirBuilder: string = '';
   dirname(module.destination())
     .split(sep)
     .forEach((dirPart: string, index: number) => {
@@ -72,7 +61,7 @@ export function codegenModule(
     name,
     path,
   });
-  const content: string = module.print(builder);
+  const content: string = await module.print(builder);
   codegenModuleWithBespokes(
     builder.getBespokes(),
     module.destination(),
@@ -88,9 +77,9 @@ export function codegenModuleWithBespokes(
   expectNoChanges: boolean,
 ): void {
   let mutableModule: string = module;
-  let originalModule: string = "";
+  let originalModule: string = '';
   if (existsSync(destination)) {
-    originalModule = readFileSync(destination, "ascii");
+    originalModule = readFileSync(destination, 'ascii');
     if (moduleCodegenIsInvalid(originalModule)) {
       throw new Error(`Invalid signature ${destination}`);
     }
@@ -109,34 +98,30 @@ export function codegenModuleWithBespokes(
   }
 }
 
-export function moduleCodegenIsInvalid(
-  module: string,
-): boolean {
+export function moduleCodegenIsInvalid(module: string): boolean {
   const regexResult: RegExpExecArray | null = /SIGNED<<(.*)>>/.exec(module);
   if (regexResult === null) {
     return true;
   }
   const actualSignature: string = regexResult[1];
-  const oldLines: string[] = module
-    .split("\n")
-    .slice(8);
+  const oldLines: string[] = module.split('\n').slice(8);
   let newLines: string[] = [];
   let exclude: boolean = false;
   for (const oldLine of oldLines) {
-    if (oldLine.indexOf("BESPOKE END") !== -1) {
+    if (oldLine.indexOf('BESPOKE END') !== -1) {
       exclude = false;
     }
     if (exclude) {
       continue;
     }
-    if (oldLine.indexOf("BESPOKE START") !== -1) {
+    if (oldLine.indexOf('BESPOKE START') !== -1) {
       exclude = true;
     }
-    newLines = [...newLines, oldLine];
+    newLines = [ ...newLines, oldLine ];
   }
-  const hash: Hash = createHash("SHA512");
-  hash.update(newLines.join("\n"));
-  const expectedSignature: string = hash.digest("base64");
+  const hash: Hash = createHash('SHA512');
+  hash.update(newLines.join('\n'));
+  const expectedSignature: string = hash.digest('base64');
 
   return actualSignature !== expectedSignature;
 }
@@ -146,9 +131,9 @@ export function codegenModuleWithBespoke(
   module: string,
   originalModule: string,
 ): string {
-  const start: string = startTemplate.replace("@0", bespoke);
-  const end: string = endTemplate.replace("@0", bespoke);
-  const originalLines: string[] = originalModule.split("\n");
+  const start: string = startTemplate.replace('@0', bespoke);
+  const end: string = endTemplate.replace('@0', bespoke);
+  const originalLines: string[] = originalModule.split('\n');
   const originalStartIdx: number = originalLines.findIndex(
     (line: string): boolean => line.indexOf(start) !== -1,
   );
@@ -162,17 +147,15 @@ export function codegenModuleWithBespoke(
     originalStartIdx + 1,
     originalEndIdx,
   );
-  const lines: string[] = module.split("\n");
+  const lines: string[] = module.split('\n');
   const startIdx: number = lines.findIndex(
     (line: string): boolean => line.indexOf(start) !== -1,
   );
   const endIdx: number = lines.findIndex(
     (line: string): boolean => line.indexOf(end) !== -1,
   );
-  const moduleStart: string[] = lines.slice(0, startIdx  + 1);
+  const moduleStart: string[] = lines.slice(0, startIdx + 1);
   const moduleEnd: string[] = lines.slice(endIdx);
 
-  return ([] as string[])
-    .concat(moduleStart, customCode, moduleEnd)
-    .join("\n");
+  return ([] as string[]).concat(moduleStart, customCode, moduleEnd).join('\n');
 }

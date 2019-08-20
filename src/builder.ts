@@ -174,7 +174,7 @@ export class Builder {
     return this._indent(1);
   }
 
-  public print(): string {
+  public async print(): Promise<string> {
     this.verify(EBuilderVerifyMode.PRINT);
     const b: Builder = Builder.new(this.props);
     if (this.header !== undefined) {
