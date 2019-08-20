@@ -20,17 +20,17 @@ export class Builder {
     return new Builder(props);
   }
 
-  private bespokes: string[] = [];
-  private built: string = '';
-  private forLevel: number = 0;
-  private header: string | undefined;
-  private identifiers: string[] = [];
-  private ifLevel: number = 0;
-  private indentation: number = 0;
-  private switchCaseLevel: number = 0;
-  private tryLevel: number = 0;
+  protected bespokes: string[] = [];
+  protected built: string = '';
+  protected forLevel: number = 0;
+  protected header: string | undefined;
+  protected identifiers: string[] = [];
+  protected ifLevel: number = 0;
+  protected indentation: number = 0;
+  protected switchCaseLevel: number = 0;
+  protected tryLevel: number = 0;
 
-  public constructor(private readonly props: IBuilder) {}
+  public constructor(protected readonly props: IBuilder) {}
 
   public add(content: string): Builder {
     return this._add(content, false, false, false);
@@ -229,7 +229,7 @@ export class Builder {
     return this;
   }
 
-  private _add(
+  protected _add(
     content: string,
     isAsync: boolean,
     newlineAfter: boolean,
@@ -253,7 +253,7 @@ export class Builder {
     return this;
   }
 
-  private _ensureOnNewline(newLinesWanted: number): Builder {
+  protected _ensureOnNewline(newLinesWanted: number): Builder {
     if (this.built.length === 0) {
       return this;
     }
@@ -270,14 +270,14 @@ export class Builder {
     return this;
   }
 
-  private _indent(delta: number): Builder {
+  protected _indent(delta: number): Builder {
     this.indentation += delta;
     this.verify(EBuilderVerifyMode.INDENT);
 
     return this;
   }
 
-  private verify(mode: EBuilderVerifyMode, content?: string): void {
+  protected verify(mode: EBuilderVerifyMode, content?: string): void {
     if (mode === EBuilderVerifyMode.CASE) {
       if (this.switchCaseLevel < 1 || this.switchCaseLevel % 2 !== 0) {
         throw new Error('Not inside case statement');
