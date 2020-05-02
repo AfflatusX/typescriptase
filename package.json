@@ -8,7 +8,7 @@
   "author": "Ari Chivukula <ari@chivuku.la>",
   "license": "MIT",
   "scripts": {
-    "postinstall": "tsc"
+    "postinstall": "yarn tsc"
   },
   "dependencies": {
     "@babel/polyfill": "7.2.5",
