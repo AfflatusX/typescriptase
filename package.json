@@ -8,6 +8,7 @@
   "author": "Ari Chivukula <ari@chivuku.la>",
   "license": "MIT",
   "scripts": {
+    "tsc": "tsc",
     "postinstall": "yarn tsc"
   },
   "dependencies": {
