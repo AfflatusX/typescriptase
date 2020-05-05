@@ -9,6 +9,7 @@ export namespace Class {
     readonly implements?: string[];
     readonly name: string;
     readonly templates?: string[];
+    readonly decorators?: string[];
   }
 
   export abstract class Base extends NamedRenderer {
@@ -22,6 +23,9 @@ export namespace Class {
     }
 
     protected render(builder: Builder): void {
+      if (this.props.decorators != null) {
+        this.props.decorators.forEach(d => builder.addThenNewline(d));
+      }
       builder.withIdentifiers(this.props.name);
       if (this.exported) {
         builder.add("export ");
