@@ -17,12 +17,14 @@ export namespace Method {
 
   export interface IConstructor extends IBase {
     readonly inTypes: Array<Type.Argument | Type.FromProperty>;
+    readonly decorators?: string[];
   }
 
   export interface INormal extends IBase {
     readonly inTypes: Type.Argument[];
     readonly name: string;
     readonly outType: Type.Anonymous;
+    readonly decorators?: string[];
   }
 
   export type T = IConstructor | INormal;
@@ -39,6 +41,9 @@ export namespace Method {
     }
 
     protected render(builder: Builder): void {
+      if (this.props.decorators != null) {
+        this.props.decorators.forEach(d => builder.addThenNewline(`@${d}`));
+      }
       builder.add(`${this.kind} `);
       if (this.isStatic) {
         builder.add("static ");
