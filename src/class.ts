@@ -24,7 +24,7 @@ export namespace Class {
 
     protected render(builder: Builder): void {
       if (this.props.decorators != null) {
-        this.props.decorators.forEach(d => builder.addThenNewline(d));
+        this.props.decorators.forEach(d => builder.addThenNewline(`@${d}`));
       }
       builder.withIdentifiers(this.props.name);
       if (this.exported) {
