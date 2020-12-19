@@ -1,6 +1,6 @@
 {
   "name": "typescriptase",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "TypeScript Codegen",
   "main": "bin/index.js",
   "types": "bin/index.d.ts",
@@ -8,7 +8,7 @@
   "author": "Tee Xie <afflatus.x@live.com>",
   "license": "MIT",
   "scripts": {
-    "postinstall": "yarn tsc"
+    "postinstall": "tsc"
   },
   "dependencies": {
     "@babel/polyfill": "7.2.5",
