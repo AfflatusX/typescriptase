@@ -8,7 +8,7 @@
   "author": "Tee Xie <afflatus.x@live.com>",
   "license": "MIT",
   "scripts": {
-    "postinstall": "./node_modules/.bin/tsc"
+    "postinstall": "yarn tsc"
   },
   "dependencies": {
     "@babel/polyfill": "7.2.5",
